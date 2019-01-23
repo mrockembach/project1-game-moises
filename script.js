@@ -1,15 +1,18 @@
 var myGamePiece;
 var myBackground;
 var myObstacle;
-
+var myObstacles;
 
 function startGame() {
 
-    myGamePiece = new component(80, 50, "front-plane.png", 10, 120, "image");
+    myGamePiece = new component(65, 40, "front-plane.png", 10, 300, "image");
     myBackground = new component(800, 400, "background.png", 0, 0, "background");
     myObstacle = new component(40, 40, "ballon.png", 500, 200,"image");
+    myObstacles = [new component(40, 40, "ballon.png", 500, 50,"image")];
     myGameArea.start();
 }
+
+// ------ Draw the game area ------
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
@@ -19,9 +22,7 @@ var myGameArea = {
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.frameNo = 0;
-        this.interval = setInterval(updateGameArea, 20);
-    // TODO: IMPLEMENT KEYBOARD NAVIGATION
-    
+        this.interval = setInterval(updateGameArea, 20);    
         },
     clear : function() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -75,7 +76,10 @@ function component(width, height, color, x, y, type) {
                 this.x = 0;
             }
         }
-    }    
+    }
+
+    // ------ detect colision ------    
+    
     this.crashWith = function(otherobj) {
     var myleft = this.x;
     var myright = this.x + (this.width);
@@ -96,8 +100,6 @@ function component(width, height, color, x, y, type) {
   }
 }
 
-// PUT SOME RANDOM OBSTACLES
-
 function updateGameArea() {
     if (myGamePiece.crashWith(myObstacle)) {
     myGameArea.stop();
@@ -108,16 +110,37 @@ function updateGameArea() {
     myBackground.update();
     myGamePiece.newPos();    
     myGamePiece.update();
+    for (i = 0; i<myObstacles.length; i++) {
+        myGamePiece.newPos();  
+        myObstacles[i].update()
+    }
     myObstacle.x += -1;
     myObstacle.update();
     }
 }
-function move(dir) {
-    if (dir == "up") {myGamePiece.speedY = -1; myGamePiece.image.src = "up-plane.png";}
-    if (dir == "down") {myGamePiece.speedY = 1; myGamePiece.image.src = "down-plane.png";}
-    if (dir == "left") {myGamePiece.speedX = -1; }
-    if (dir == "right") {myGamePiece.speedX = 1; }
+
+window.onkeydown = function(event) {
+    event.preventDefault()
+    if (event.keyCode == 38) {myGamePiece.speedY = -1; }
+    if (event.keyCode == 40) {myGamePiece.speedY = 1; }
+    if (event.keyCode == 37) {myGamePiece.speedX = -1; }
+    if (event.keyCode == 39) {myGamePiece.speedX = 1; }
+
 }
+
+// Stop the airplane movement
+
+// window.addEventListener('keydown', function (e) {
+//     e.preventDefault();
+//     event.keyCode = (event.keyCode || []);
+//     event.keyCode[e.keyCode] = (e.type == "keydown");
+// })
+// window.addEventListener('keyup', function (e) {
+//     event.keyCode[e.keyCode] = (e.type == "keydown");
+// })
+
+
+
 
 function clearmove() {
     myGamePiece.image.src = "front-plane.png";
