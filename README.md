@@ -1,3 +1,3 @@
 # Airplane Game
 ## 
-sss
+Instructions
