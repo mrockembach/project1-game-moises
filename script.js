@@ -96,7 +96,7 @@ function component(width, height, color, x, y, type) {
   }
 }
 
-// PUT SOME OBSTACLES
+// PUT SOME RANDOM OBSTACLES
 
 function updateGameArea() {
     if (myGamePiece.crashWith(myObstacle)) {
