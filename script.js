@@ -1,151 +1,246 @@
-var myGamePiece;
-var myBackground;
-var myObstacle;
-var myObstacles;
+// declare variables
+var
 
-function startGame() {
+COLS = 25,
+ROWS = 25,
+EMPTY = 0,
+SNAKE = 1,
+FRUIT = 2,
+LEFT  = 0,
+UP    = 1,
+RIGHT = 2,
+DOWN  = 3,
+KEY_LEFT  = 37, 
+KEY_UP    = 38, 
+KEY_RIGHT = 39, 
+KEY_DOWN  = 40,
 
-    myGamePiece = new component(65, 40, "front-plane.png", 10, 300, "image");
-    myBackground = new component(800, 400, "background.png", 0, 0, "background");
-    myObstacle = new component(40, 40, "ballon.png", 500, 200,"image");
-    myObstacles = [new component(40, 40, "ballon.png", 500, 50,"image")];
-    myGameArea.start();
-}
+// create array 
 
-// ------ Draw the game area ------
+obstacle = [[0,0,2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2,0,0]],
+           
 
-var myGameArea = {
-    canvas : document.createElement("canvas"),
-    start : function() {
-        this.canvas.width = 800;
-        this.canvas.height = 400;
-        this.context = this.canvas.getContext("2d");
-        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-        this.frameNo = 0;
-        this.interval = setInterval(updateGameArea, 20);    
-        },
-    clear : function() {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    },
-    stop : function() {
-        clearInterval(this.interval);
-    }
-}
-
-function everyinterval(n) {
-  if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
-  return false;
-}
+// Objects 
+canvas,	  
+ctx,	  
+keystate, 
+frames,   
+score;	  
 
 
-function component(width, height, color, x, y, type) {
-    this.type = type;
-    if (type == "image" || type == "background") {
-        this.image = new Image();
-        this.image.src = color;
-    }
-    this.width = width;
-    this.height = height;
-    this.speedX = 0;
-    this.speedY = 0;    
-    this.x = x;
-    this.y = y;    
-    this.update = function() {
-        ctx = myGameArea.context;
-        if (type == "image" || type == "background") {
-            ctx.drawImage(this.image, 
-                this.x, 
-                this.y,
-                this.width, this.height);
-        if (type == "background") {
-            ctx.drawImage(this.image, 
-                this.x + this.width, 
-                this.y,
-                this.width, this.height);
-        }
-        } else {
-            ctx.fillStyle = color;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-        }
-    }
-    this.newPos = function() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.type == "background") {
-            if (this.x == -(this.width)) {
-                this.x = 0;
-            }
-        }
-    }
-
-    // ------ detect colision ------    
+// amounts of columns, rows and initiation function
+grid = {
+	width: null, 
+	height: null, 
+    _grid: null,  
+	init: function(d, c, r) { 
+		this.width = c; 
+		this.height = r; 
+        this._grid = []; 
+		for (var x=0; x < c; x++) {
+			this._grid.push([]); 
+			for (var y=0; y < r; y++) {
+				this._grid[x].push(d); 
+			}
+		}
+	},
+	set: function(val, x, y) { 
+		this._grid[x][y] = val;
+	},
+	
+	get: function(x, y) { 
+		return this._grid[x][y];
+	}
     
-    this.crashWith = function(otherobj) {
-    var myleft = this.x;
-    var myright = this.x + (this.width);
-    var mytop = this.y;
-    var mybottom = this.y + (this.height);
-    var otherleft = otherobj.x;
-    var otherright = otherobj.x + (otherobj.width);
-    var othertop = otherobj.y;
-    var otherbottom = otherobj.y + (otherobj.height);
-    var crash = true;
-    if ((mybottom < othertop) ||
-    (mytop > otherbottom) ||
-    (myright < otherleft) ||
-    (myleft > otherright)) {
-      crash = false;
-    }
-    return crash;
-  }
+}
+// Create Snake
+snake = { 
+	direction: null, 
+	last: null,		 
+	_queue: null,	 
+
+    // start position
+	init: function(d, x, y) {
+		this.direction = d; 
+		this._queue = []; 
+		this.insert(x, y); 
+	},
+    
+    
+	insert: function(x, y) {
+		this._queue.unshift({x:x, y:y}); 
+		this.last = this._queue[0];
+	},
+	
+
+	remove: function() {
+		return this._queue.pop();
+	}
+};
+
+function obstacle() {
+    empty.push({obstacle});
+            
+    ctx.beginPath();
+    ctx.rect(obstacle);
+    ctx.fillStyle = "#7a26ce";
+    ctx.fill();
+    ctx.closePath();
 }
 
-function updateGameArea() {
-    if (myGamePiece.crashWith(myObstacle)) {
-    myGameArea.stop();
-    } else {
-    myGameArea.clear();    
-    myBackground.speedX = -2;
-    myBackground.newPos();    
-    myBackground.update();
-    myGamePiece.newPos();    
-    myGamePiece.update();
-    for (i = 0; i<myObstacles.length; i++) {
-        myGamePiece.newPos();  
-        myObstacles[i].update()
-    }
-    myObstacle.x += -1;
-    myObstacle.update();
-    }
+// Set Food element
+function setFood() { 
+	var empty = []; 
+
+	for (var x=0; x < grid.width; x++) {
+		for (var y=0; y < grid.height; y++) {
+			if (grid.get(x, y) === EMPTY) {
+				empty.push({x:x, y:y});
+			}
+		}
+	}
+	// Apply Math.random to pick empty cell
+	var randpos = empty[Math.round(Math.random()*(empty.length - 1))];
+	grid.set(FRUIT, randpos.x, randpos.y);
 }
 
-window.onkeydown = function(event) {
-    event.preventDefault()
-    if (event.keyCode == 38) {myGamePiece.speedY = -1; }
-    if (event.keyCode == 40) {myGamePiece.speedY = 1; }
-    if (event.keyCode == 37) {myGamePiece.speedX = -1; }
-    if (event.keyCode == 39) {myGamePiece.speedX = 1; }
+// call functions and canvas
+function main() { 
 
+	canvas = document.createElement("canvas");
+	canvas.width = COLS*20;  
+	canvas.height = ROWS*20; 
+	ctx = canvas.getContext("2d");
+
+	document.body.appendChild(canvas); 
+	frames = 0;
+	keystate = {};
+    
+    // 
+	document.addEventListener("keydown", function(evt) { 
+		keystate[evt.keyCode] = true;
+	});
+	document.addEventListener("keyup", function(evt) { 
+		delete keystate[evt.keyCode];
+	});
+    
+    // Initiate Game Loop 
+    init();
+    // Start Game Loop
+	loop();  
+}
+// Reset and intiate game objects
+
+function init() { 
+	score = 0; 
+	grid.init(EMPTY, COLS, ROWS);
+    
+    
+	var sp = {x:Math.floor(COLS/2), y:ROWS-1};
+	snake.init(UP, sp.x, sp.y); // Start direction
+	grid.set(SNAKE, sp.x, sp.y);
+	setFood();
+    grid._grid = grid._grid.concat(obstacle);
 }
 
-// Stop the airplane movement
-
-// window.addEventListener('keydown', function (e) {
-//     e.preventDefault();
-//     event.keyCode = (event.keyCode || []);
-//     event.keyCode[e.keyCode] = (e.type == "keydown");
-// })
-// window.addEventListener('keyup', function (e) {
-//     event.keyCode[e.keyCode] = (e.type == "keydown");
-// })
-
-
-
-
-function clearmove() {
-    myGamePiece.image.src = "front-plane.png";
-    myGamePiece.speedX = 0; 
-    myGamePiece.speedY = 0; 
+// Game loop
+function loop() { 
+    update();
+	draw();
+	window.requestAnimationFrame(loop, canvas); // Canvas will call loop function when it needs to redraw
 }
 
-startGame()
+// update function
+function update() { 
+	frames++;
+	
+	if (keystate[KEY_LEFT] && snake.direction !== RIGHT) {
+		snake.direction = LEFT;
+	}
+	if (keystate[KEY_UP] && snake.direction !== DOWN) {
+		snake.direction = UP;
+	}
+	if (keystate[KEY_RIGHT] && snake.direction !== LEFT) {
+		snake.direction = RIGHT;
+	}
+	if (keystate[KEY_DOWN] && snake.direction !== UP) {
+		snake.direction = DOWN;
+	}
+	
+	if (frames%5 === 0) {
+		
+		var nx = snake.last.x;
+		var ny = snake.last.y;
+		
+		switch (snake.direction) {
+			case LEFT:
+				nx--;
+				break;
+			case UP:
+				ny--;
+				break;
+			case RIGHT:
+				nx++;
+				break;
+			case DOWN:
+				ny++;
+				break;
+		}
+		
+		if (0 > nx || nx > grid.width-1  ||
+			0 > ny || ny > grid.height-1 ||
+			grid.get(nx, ny) === SNAKE
+		) {
+			return init();
+            
+		}
+		
+		if (grid.get(nx, ny) === FRUIT) {
+			
+			score++;
+			setFood();
+            
+		} else {
+			
+			var tail = snake.remove();
+			grid.set(EMPTY, tail.x, tail.y);
+            
+		}
+        
+		
+		grid.set(SNAKE, nx, ny);
+		snake.insert(nx, ny);
+        
+	}
+}
+// render grid to canvas
+function draw() { 
+	var tw = canvas.width/grid.width;  
+	var th = canvas.height/grid.height; 
+	
+	for (var x=0; x < grid.width; x++) { 
+		for (var y=0; y < grid.height; y++) {
+			
+			switch (grid.get(x, y)) {
+				case EMPTY:
+					ctx.fillStyle = "#5a5a5a";
+					break;
+				case SNAKE:
+					ctx.fillStyle = "#B54548";
+					break;
+				case FRUIT:
+					ctx.fillStyle = "lightblue";
+					break;
+                case obstacle:
+                    ctx.fillStyle = "yellow";
+                    break;
+			}
+			ctx.fillRect(x*tw, y*th, tw, th);
+		}
+	}
+	// Score
+	ctx.fillStyle = "#0ff";
+	ctx.fillText("SCORE: " + score, 10, canvas.height-10);
+}
+
+main();
