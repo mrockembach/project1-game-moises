@@ -1,3 +1,4 @@
+//Project 1 game
 // declare variables
 var
 
@@ -17,7 +18,7 @@ KEY_DOWN  = 40,
 
 // create array 
 
-obstacle = [[0,0,2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2,0,0]],
+// obstacle = [[0,0,2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2,0,0]],
            
 
 // Objects 
@@ -88,7 +89,7 @@ function obstacle() {
     ctx.closePath();
 }
 
-// Set Food element
+// Set Fruit element
 function setFood() { 
 	var empty = []; 
 
@@ -103,6 +104,40 @@ function setFood() {
 	var randpos = empty[Math.round(Math.random()*(empty.length - 1))];
 	grid.set(FRUIT, randpos.x, randpos.y);
 }
+var playerDirection = {
+	left: false,
+	right: false,
+	up: false,
+	down: false, 
+}
+
+// add event listener
+window.addEventListener('keydown', keyListener)
+window.addEventListener('keyup', keyListener)
+
+function keyListener(event) {
+	var key_state = event.type === "keydown" ? true : false;
+
+
+switch (event.keyCode) {
+	case 39:
+	playerDirection.right = key_state
+	break
+	case 37:
+	playerDirection.left = key_state
+	break
+	case 38:
+	playerDirection.up = key_state
+	break
+	case 40:
+	playerDirection.down = key_state
+	break
+	}
+}
+
+
+
+
 
 // call functions and canvas
 function main() { 
@@ -154,16 +189,16 @@ function loop() {
 function update() { 
 	frames++;
 	
-	if (keystate[KEY_LEFT] && snake.direction !== RIGHT) {
+	if (playerDirection.left && snake.direction !== RIGHT) {
 		snake.direction = LEFT;
 	}
-	if (keystate[KEY_UP] && snake.direction !== DOWN) {
+	if (playerDirection.up && snake.direction !== DOWN) {
 		snake.direction = UP;
 	}
-	if (keystate[KEY_RIGHT] && snake.direction !== LEFT) {
+	if (playerDirection.right && snake.direction !== LEFT) {
 		snake.direction = RIGHT;
 	}
-	if (keystate[KEY_DOWN] && snake.direction !== UP) {
+	if (playerDirection.down && snake.direction !== UP) {
 		snake.direction = DOWN;
 	}
 	
@@ -213,8 +248,17 @@ function update() {
         
 	}
 }
-// render grid to canvas
+
+var fruit = new Image()
+fruit.src = 'images/apple.png'
+
+var background = new Image()
+background.src = 'images/spiral.gif'
+
+// grid to canvas
 function draw() { 
+
+	
 	var tw = canvas.width/grid.width;  
 	var th = canvas.height/grid.height; 
 	
@@ -223,19 +267,28 @@ function draw() {
 			
 			switch (grid.get(x, y)) {
 				case EMPTY:
-					ctx.fillStyle = "#5a5a5a";
+					ctx.fillStyle = "grey";
+					ctx.drawImage(background, x*tw, y*th, tw, th);
+					// ctx.fillRect(x*tw, y*th, tw, th);
+
 					break;
 				case SNAKE:
 					ctx.fillStyle = "#B54548";
+					ctx.fillRect(x*tw, y*th, tw, th);
+
 					break;
 				case FRUIT:
 					ctx.fillStyle = "lightblue";
+	
+					ctx.drawImage(fruit, x*tw, y*th, tw, th);
+
 					break;
-                case obstacle:
-                    ctx.fillStyle = "yellow";
+                // case obstacle:
+				// 	ctx.fillStyle = "yellow";
+				// ctx.fillRect(x*tw, y*th, tw, th);
+					
                     break;
 			}
-			ctx.fillRect(x*tw, y*th, tw, th);
 		}
 	}
 	// Score
