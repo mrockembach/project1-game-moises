@@ -18,7 +18,7 @@ KEY_DOWN  = 40,
 
 // create array 
 
-// obstacle = [[0,0,2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2,0,0]],
+// obstacle = [[2,0,0,0,2,0,2,0,0,2,0,0,0,0,2,0,0,0,2,0,0,2,0,0,2]],
            
 
 // Objects 
@@ -135,10 +135,6 @@ switch (event.keyCode) {
 	}
 }
 
-
-
-
-
 // call functions and canvas
 function main() { 
 
@@ -172,17 +168,18 @@ function init() {
     
     
 	var sp = {x:Math.floor(COLS/2), y:ROWS-1};
-	snake.init(UP, sp.x, sp.y); // Start direction
+	// Start direction
+	snake.init(UP, sp.x, sp.y); 
 	grid.set(SNAKE, sp.x, sp.y);
 	setFood();
     grid._grid = grid._grid.concat(obstacle);
 }
 
-// Game loop
+// Game loop, to redraw
 function loop() { 
     update();
 	draw();
-	window.requestAnimationFrame(loop, canvas); // Canvas will call loop function when it needs to redraw
+	window.requestAnimationFrame(loop, canvas); 
 }
 
 // update function
@@ -267,13 +264,13 @@ function draw() {
 			
 			switch (grid.get(x, y)) {
 				case EMPTY:
-					ctx.fillStyle = "grey";
-					ctx.drawImage(background, x*tw, y*th, tw, th);
+					ctx.fillStyle = "";
 					// ctx.fillRect(x*tw, y*th, tw, th);
+					// ctx.drawImage(background, x*tw, y*th, tw, th);
 
 					break;
 				case SNAKE:
-					ctx.fillStyle = "#B54548";
+					ctx.fillStyle = "green";
 					ctx.fillRect(x*tw, y*th, tw, th);
 
 					break;
@@ -292,7 +289,7 @@ function draw() {
 		}
 	}
 	// Score
-	ctx.fillStyle = "#0ff";
+	ctx.fillStyle = "black";
 	ctx.fillText("SCORE: " + score, 10, canvas.height-10);
 }
 
