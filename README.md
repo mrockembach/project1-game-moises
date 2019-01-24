@@ -1,3 +1,1 @@
-# Airplane Game
-## 
-Instructions
+# Project 1 - game
