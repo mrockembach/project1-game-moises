@@ -1,7 +1,6 @@
-//Project 1 game
+//Project - Snake Game
 // declare variables
 var
-
 COLS = 25,
 ROWS = 25,
 EMPTY = 0,
@@ -18,7 +17,7 @@ KEY_DOWN  = 40,
 
 // create array 
 
-// obstacle = [[2,0,0,0,2,0,2,0,0,2,0,0,0,0,2,0,0,0,2,0,0,2,0,0,2]],
+// obstacle = [[0,0,2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,2,0,0]],
            
 
 // Objects 
@@ -264,8 +263,8 @@ function draw() {
 			
 			switch (grid.get(x, y)) {
 				case EMPTY:
-					ctx.fillStyle = "";
-					// ctx.fillRect(x*tw, y*th, tw, th);
+					ctx.fillStyle = "lightyellow";
+					ctx.fillRect(x*tw, y*th, tw, th);
 					// ctx.drawImage(background, x*tw, y*th, tw, th);
 
 					break;
