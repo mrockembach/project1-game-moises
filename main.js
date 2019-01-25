@@ -115,6 +115,7 @@ window.addEventListener('keydown', keyListener)
 window.addEventListener('keyup', keyListener)
 
 function keyListener(event) {
+	event.preventDefault()
 	var key_state = event.type === "keydown" ? true : false;
 
 
