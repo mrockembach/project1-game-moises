@@ -248,8 +248,7 @@ function update() {
 var fruit = new Image()
 fruit.src = 'images/apple.png'
 
-var background = new Image()
-background.src = 'images/spiral.gif'
+
 
 // grid to canvas
 function draw() { 
@@ -265,7 +264,7 @@ function draw() {
 				case EMPTY:
 					ctx.fillStyle = "lightyellow";
 					ctx.fillRect(x*tw, y*th, tw, th);
-					// ctx.drawImage(background, x*tw, y*th, tw, th);
+
 
 					break;
 				case SNAKE:
