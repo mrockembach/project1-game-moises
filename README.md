@@ -1,1 +1,2 @@
-# Project 1 - game
+# Project - Game
+Snake Game - Have fun!!
